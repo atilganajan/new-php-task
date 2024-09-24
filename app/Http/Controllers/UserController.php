@@ -13,9 +13,8 @@ class UserController
         $this->pdo = $database->getConnection();
     }
 
-    public function show($id = null)
+    public function show($id)
     {
-
         try {
             $pdo = $this->pdo;
             $query = $pdo->prepare("SELECT * FROM users WHERE id = :id");
@@ -37,6 +36,33 @@ class UserController
         }catch (\Exception $e){
              http_response_code(500);
              $this->view('errors/500.php');
+            return;
+        }
+    }
+
+    public function showOptional($id = null)
+    {
+        try {
+            $pdo = $this->pdo;
+            $query = $pdo->prepare("SELECT * FROM users WHERE id = :id");
+            $query->bindParam(':id', $id, PDO::PARAM_INT);
+            $query->execute();
+            $user = $query->fetch(PDO::FETCH_OBJ);
+
+
+            if ($user === false && $id !== null) {
+                http_response_code(404);
+                $this->view('errors/404.php');
+                return;
+            }
+
+            $this->view('user/show.php', [
+                'user' => $user
+            ]);
+            return;
+        }catch (\Exception $e){
+            http_response_code(500);
+            $this->view('errors/500.php');
             return;
         }
     }

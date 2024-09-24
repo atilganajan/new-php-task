@@ -10,8 +10,8 @@
     <h1>Detail</h1>
 </header>
 <main>
-    <p>User ID: <?= htmlspecialchars($user->id) ?></p>
-    <p>User Full Name: <?= htmlspecialchars($user->full_name) ?></p>
+    <p>User ID: <?= htmlspecialchars($user->id ?? 'Opsiyonel') ?></p>
+    <p>User Full Name: <?= htmlspecialchars($user->full_name ?? 'Opsiyonel') ?></p>
     <?php if (isset($language)): ?>
         <p>Language: <?= htmlspecialchars($language->name) ?></p>
     <?php endif; ?>

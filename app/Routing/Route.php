@@ -55,8 +55,9 @@ class Route
     {
         return preg_replace_callback('/\{(\w+)(:([^}]+))?\??\}/', function ($matches) {
             $regex = isset($matches[3]) ? $matches[3] : '[^\/]+';
-            return "($regex)";
-        }, trim($uri, '/'));
+            $optional = isset($matches[0]) && strpos($matches[0], '?') !== false ? "?" : "";
+            return "($regex)$optional";
+        }, trim($uri, '/') );
     }
 
     public static function resolve()
@@ -65,9 +66,22 @@ class Route
         $requestMethod = $_SERVER['REQUEST_METHOD'];
 
 
+
+
+
         foreach (self::$routes as $route) {
-            if (preg_match("#^" . $route['uri_pattern'] . "$#", $requestUri, $matches) && $route['method'] === $requestMethod) {
-                array_shift($matches); // İlk eleman tüm URI olduğundan atılıyor
+
+            $uri_pattert_arr = explode($requestUri,$route['uri_pattern']);
+
+            if(isset($uri_pattert_arr[1]) && $uri_pattert_arr[1] == "/([^\/]+)?"){
+
+                $route['uri_pattern'] = $requestUri;
+            }
+
+            $pattern = "#^" . $route['uri_pattern'] . "$#";
+            if (preg_match($pattern, $requestUri, $matches)) {
+
+                array_shift($matches);
 
                 // Middleware kontrolü
                 $lastMiddleware = function() use ($route, $matches) {
